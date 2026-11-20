@@ -18,13 +18,7 @@ if(String(u).indexOf("ransomware-id.json")>=0){D.generated_at=new Date(Date.now(
 </head><body>
 <div class="nav"><img src="__LOGO__" alt="Logo Vaksin.com" width="168" height="52"><div><span>HOME</span><span>LAYANAN</span><span>DATA</span><span>ARTIKEL</span><span>KONTAK</span><span>SITE INTEL</span></div></div>
 '''.replace("__DATA__", data)
-pick = '''<div class="pick" aria-label="Pilih warna cahaya (hanya di preview)">Warna cahaya:
-<button data-c="#ffd56a" class="on" style="background:#ffd56a" title="Kuning (default)"></button>
-<button data-c="#ff4d5e" style="background:#ff4d5e" title="Merah"></button>
-<button data-c="#6f8dff" style="background:#6f8dff" title="Biru"></button>
-<button data-c="#e9f1ff" style="background:#e9f1ff" title="Putih"></button></div>
-<script>document.querySelectorAll(".pick button").forEach(function(b){b.onclick=function(){document.getElementById("vkrw-host").shadowRoot.getElementById("vkrw").style.setProperty("--glow",b.dataset.c);document.querySelectorAll(".pick button").forEach(function(x){x.classList.toggle("on",x===b)})}})</script>
-</body></html>'''
+pick = '''</body></html>'''
 import base64
 logo = "data:image/png;base64," + base64.b64encode((R / "preview_logo.png").read_bytes()).decode()
 (R / "preview.html").write_text((head + w + pick).replace("__LOGO__", logo), encoding="utf-8")
