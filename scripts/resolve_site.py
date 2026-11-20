@@ -96,6 +96,20 @@ def covers(name_tokens: list[str], text: str) -> bool:
     return all((f" {w} " in f" {hay} ") or (len(w) >= 4 and w in squashed) for w in distinctive)
 
 
+PLACE = re.compile(r"\b(kecamatan|kelurahan|desa|kabupaten|kota|provinsi|district|subdistrict|"
+                   r"village|regency|province|city|pulau|island|sungai|river|gunung|mountain)\b", re.I)
+
+
+def norm(label: str) -> str:
+    return " ".join(w for w in re.findall(r"[a-z0-9]+", label.lower()) if w not in STOP)
+
+
+def single_word(name_tokens: list[str]) -> str | None:
+    """Kata khas tunggal bila nama hanya punya satu kata khas, selain itu None."""
+    d = [w for w in name_tokens if w not in GENERIC and w not in DESCRIPTIVE]
+    return d[0] if len(d) == 1 else None
+
+
 def from_wikidata(name: str) -> tuple[str | None, str]:
     q = query_name(name)
     if not q:
@@ -107,7 +121,7 @@ def from_wikidata(name: str) -> tuple[str | None, str]:
     if not ids:
         return None, "tidak ada di basis data publik"
     ents = json.loads(_get(f"{WD_API}?" + urllib.parse.urlencode({
-        "action": "wbgetentities", "format": "json", "props": "claims|labels|aliases",
+        "action": "wbgetentities", "format": "json", "props": "claims|labels|aliases|descriptions",
         "languages": "id|en", "ids": "|".join(ids)}))).get("entities", {})
     tk = tokens(name)
     cands = []
@@ -119,7 +133,15 @@ def from_wikidata(name: str) -> tuple[str | None, str]:
             continue
         labels = [v["value"] for v in e.get("labels", {}).values()]
         labels += [a["value"] for lst in e.get("aliases", {}).values() for a in lst]
-        if not any(covers(tk, lab) for lab in labels):
+        descs = " ".join(v["value"] for v in e.get("descriptions", {}).values())
+        # wilayah administratif (kecamatan/desa/kabupaten) bukan organisasi korban
+        if PLACE.search(descs) and not PLACE.search(name):
+            continue
+        if single_word(tk):
+            # nama satu kata (mis. "Samudera") hanya diterima bila labelnya persis sama
+            if not any(norm(lab) == single_word(tk) for lab in labels):
+                continue
+        elif not any(covers(tk, lab) for lab in labels):
             continue
         sites = [s["mainsnak"].get("datavalue", {}).get("value") for s in c.get("P856", [])]
         hosts = sorted({h for h in map(host_of, sites) if h})

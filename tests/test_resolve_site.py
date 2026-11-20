@@ -13,9 +13,13 @@ ENT = {
     "Q4": ("Solaria", "Q252", "https://solariaresto.co.id/"),
     "Q5": ("Solaria", "Q29", "https://solaria.es/"),            # Spanyol, bukan Indonesia
     "Q6": ("Garuda Indonesia", "Q252", "https://www.garuda-indonesia.com/"),
+    "Q7": ("Kecamatan Samudera", "Q252", "https://kecsamudera.sigapaceh.id/"),
+    "Q8": ("Pertamina", "Q252", "http://www.pertamina.com"),
 }
+DESC = {"Q7": "kecamatan di Kabupaten Aceh Utara, Aceh"}
 SEARCH = {"sarimelati kencana": ["Q1"], "bintan bank": [], "ilcs pelindo": ["Q3"], "solaria": ["Q5", "Q4"],
-          "garuda airlines airports indonesia": ["Q6"]}
+          "garuda airlines airports indonesia": ["Q6"],
+          "samudera": ["Q7"], "pertamina": ["Q8"]}
 
 
 def fake_get(url, headers=None, timeout=30):
@@ -24,6 +28,7 @@ def fake_get(url, headers=None, timeout=30):
         return json.dumps({"search": [{"id": i} for i in SEARCH.get(q, [])]}).encode()
     ids = url.split("ids=")[1].split("%7C")
     ents = {i: {"labels": {"id": {"value": ENT[i][0]}}, "aliases": {},
+                "descriptions": {"id": {"value": DESC.get(i, "perusahaan Indonesia")}},
                 "claims": {"P17": [{"mainsnak": {"datavalue": {"value": {"id": ENT[i][1]}}}}],
                            "P856": [{"mainsnak": {"datavalue": {"value": ENT[i][2]}}}]}} for i in ids}
     return json.dumps({"entities": ents}).encode()
@@ -51,3 +56,9 @@ def test_anak_usaha_tidak_disamakan_induk():
 def test_judul_dengan_noise():
     assert run("Garuda Indonesia Airlines, Airports")[0] == "garuda-indonesia.com"
     assert rs.query_name("PT. Bank Perekonomian Rakyat Bintan NEW") == "bank perekonomian rakyat bintan"
+
+
+def test_nama_satu_kata_tidak_nyasar_ke_wilayah():
+    # kasus nyata: "Samudera" (pelayaran) sempat dicocokkan ke situs Kecamatan Samudera, Aceh
+    assert run("Samudera (coastal shipping operations)")[0] is None
+    assert run("Pertamina")[0] == "pertamina.com"            # satu kata, label persis sama: boleh
