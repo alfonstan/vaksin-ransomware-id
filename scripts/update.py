@@ -28,6 +28,9 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import resolve_site  # noqa: E402
+
 API = "https://www.ransomlook.io/api"
 UA = "VaksincomRansomwareTracker/1.0 (+https://www.vaksin.com/data/ransomware)"
 ROOT = Path(__file__).resolve().parent.parent
@@ -206,6 +209,11 @@ def merge_dupes(victims):
     return kept
 
 
+# Sumber alamat situs untuk ditampilkan publik (tanpa nama alat).
+SRC_LABEL = {"judul": "unggahan", "deskripsi": "unggahan", "manual": "verifikasi",
+             "basis data publik": "basis data publik", "mesin pencari": "mesin pencari"}
+
+
 def vid(group, title, date):
     return hashlib.sha1(f"{group}|{title}|{date[:10]}".encode()).hexdigest()[:12]
 
@@ -215,6 +223,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=3)
     ap.add_argument("--max-groups", type=int, default=400)
+    ap.add_argument("--max-lookups", type=int, default=40, help="batas pencarian situs resmi per jalan")
     ap.add_argument("--no-fetch", action="store_true", help="hanya hitung ulang dari state (uji lokal)")
     args = ap.parse_args()
     now = datetime.now(timezone.utc)
@@ -310,6 +319,28 @@ def main():
             d, src = find_domain(v["title"], "")
             v["domain"], v["domain_via"] = d, src
 
+    # situs resmi dari basis data publik / mesin pencari bila unggahan tidak menyebutnya
+    if not args.no_fetch:
+        lookup = load(STATE / "site_lookup.json", {})
+        retry_before = (now - timedelta(days=30)).isoformat()
+        budget = args.max_lookups
+        for v in victims:
+            if v.get("domain") or v.get("domain_via") == "manual" or budget <= 0:
+                continue
+            c = lookup.get(v["org"])
+            if c and (c.get("domain") or c.get("at", "") > retry_before):
+                if c.get("domain"):
+                    v["domain"], v["domain_via"] = c["domain"], c["via"]
+                continue
+            d, why = resolve_site.resolve(v["title"])
+            budget -= 1
+            lookup[v["org"]] = {"domain": d, "via": why if d else None, "why": None if d else why,
+                                "title": v["title"], "at": now.isoformat()}
+            if d:
+                v["domain"], v["domain_via"] = d, why
+            time.sleep(1)
+        save(STATE / "site_lookup.json", dict(sorted(lookup.items())))
+
     # pangkas state lama
     cutoff = (now - timedelta(days=420)).date().isoformat()
     seen = {k: d for k, d in seen.items() if d >= cutoff}
@@ -360,7 +391,8 @@ def main():
         },
         "top_groups": [{"group": g, "count": n} for g, n in Counter(v["group"] for v in y).most_common(8)],
         "monthly": [{"month": mo, "count": monthly.get(mo, 0)} for mo in months],
-        "victims": [{**{k: v[k] for k in ("id", "date", "group", "title", "org")}, "domain": v.get("domain")} for v in y],
+        "victims": [{**{k: v[k] for k in ("id", "date", "group", "title", "org")}, "domain": v.get("domain"),
+                     "domain_src": SRC_LABEL.get(v.get("domain_via")) if v.get("domain") else None} for v in y],
     }
     save(DATA / "ransomware-id.json", out, compact=True)
     print(f"selesai: {out['stats']}")
