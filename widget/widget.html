@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;900&display=swap" rel="stylesheet">
 
 <div id="vkrw-host" style="display:block"></div>
-<template id="vkrw-tpl">
+<script type="text/html" id="vkrw-tpl">
 <style>
 :host{display:block}
 .vkrw{
@@ -293,7 +293,7 @@
 
  </div>
 </section>
-</template>
+</script>
 
 <script>
 (function(){
@@ -308,7 +308,7 @@
   if(!host || !tpl) return;
   /* Shadow DOM: CSS tema Duda tidak bisa mengubah tampilan widget */
   var sr = host.shadowRoot || host.attachShadow({mode:"open"});
-  if(!sr.getElementById("vkrw")) sr.appendChild(tpl.content.cloneNode(true));
+  if(!sr.getElementById("vkrw")) sr.innerHTML = tpl.textContent;
   var root = sr.getElementById("vkrw"); if(!root) return;
   var $ = function(id){return sr.getElementById(id)};
   var BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
