@@ -1,0 +1,455 @@
+<!-- ============================================================
+  Vaksincom — Pelacak Ransomware Indonesia (widget untuk Duda)
+  Tempel seluruh isi file ini ke widget "HTML" / Custom Code di
+  halaman vaksin.com/data/ransomware.
+
+  GANTI WARNA: ubah --glow (cahaya ambient & aksen) dan --pulse
+  (garis detak, titik LIVE, label "baru") di bawah. Warna logo Vaksincom:
+    kuning : #ffd56a  (default --glow)     merah : #ff4d5e  (default --pulse)
+    biru   : #6f8dff                        putih : #e9f1ff
+  ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+.vkrw{
+  --glow:#ffd56a;           /* <<< cahaya ambient & aksen: kuning logo vaksin.com */
+  --pulse:#ff4d5e;          /* <<< garis detak, titik LIVE, label "baru" */
+  --blue:#6f8dff;           /* status Site Intel "baik" */
+  --bg:#0b1230; --panel:#111c42; --line:#1d3263;
+  --text:#e8eefc; --muted:#93a6cb;
+  position:relative; isolation:isolate; overflow:hidden;
+  background:var(--bg); color:var(--text);
+  font-family:"Source Sans 3","Source Sans Pro",system-ui,sans-serif;
+  font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  padding:clamp(28px,5vw,64px) clamp(16px,4vw,48px) 56px;
+}
+.vkrw *{box-sizing:border-box}
+/* cahaya ambient */
+.vkrw::before,.vkrw::after{content:"";position:absolute;z-index:-1;pointer-events:none;border-radius:50%;filter:blur(90px)}
+.vkrw::before{width:720px;height:520px;left:-200px;top:-180px;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--glow) 42%,transparent),transparent)}
+.vkrw::after{width:760px;height:760px;right:-280px;top:34%;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--glow) 22%,transparent),transparent)}
+.vkrw-in{max-width:1180px;margin:0 auto}
+.vkrw a{color:var(--glow);text-underline-offset:3px}
+.vkrw a:focus-visible,.vkrw button:focus-visible,.vkrw input:focus-visible,.vkrw select:focus-visible{outline:2px solid var(--glow);outline-offset:3px}
+
+/* kepala */
+.vkrw-head{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
+.vkrw h1{font-size:clamp(34px,5.4vw,60px);line-height:1.02;font-weight:900;letter-spacing:-.02em;margin:0 0 14px;color:#fff}
+.vkrw-lede{max-width:62ch;color:var(--muted);margin:0}
+.vkrw-lede strong{color:var(--text);font-weight:600}
+.vkrw-live{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted);white-space:nowrap}
+.vkrw-dot{width:10px;height:10px;border-radius:50%;background:var(--pulse);box-shadow:0 0 0 0 var(--pulse),0 0 14px var(--pulse);animation:vkrw-pulse 2s infinite}
+.vkrw-live b{color:var(--text);font-weight:600}
+@keyframes vkrw-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--pulse) 60%,transparent),0 0 14px var(--pulse)}70%{box-shadow:0 0 0 12px transparent,0 0 14px var(--pulse)}100%{box-shadow:0 0 0 0 transparent,0 0 14px var(--pulse)}}
+
+/* monitor detak — elemen utama */
+.vkrw-mon{position:relative;border:1px solid color-mix(in srgb,var(--glow) 30%,var(--line));border-radius:18px;
+  background:linear-gradient(180deg,#0c1738,#080f2a);
+  box-shadow:0 0 0 1px rgba(255,255,255,.02) inset,0 30px 110px -25px color-mix(in srgb,var(--glow) 60%,transparent),0 0 60px -20px color-mix(in srgb,var(--glow) 35%,transparent) inset}
+.vkrw-mon-top{display:flex;justify-content:space-between;gap:12px;padding:16px 22px 0;font-size:14px;color:var(--muted)}
+.vkrw-mon-top span:first-child{color:var(--text);font-weight:600}
+.vkrw-mon-top span:last-child{white-space:nowrap}
+.vkrw-ecg{position:relative;height:200px;margin:4px 0 0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:100% 40px,40px 100%;background-position:0 -1px,-1px 0;opacity:.95}
+.vkrw-ecg svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.vkrw-trace{fill:none;stroke:var(--pulse);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;
+  filter:drop-shadow(0 0 4px var(--pulse)) drop-shadow(0 0 12px color-mix(in srgb,var(--pulse) 70%,transparent))}
+.vkrw-trace.draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:vkrw-draw 2.6s cubic-bezier(.6,.1,.3,1) forwards}
+@keyframes vkrw-draw{to{stroke-dashoffset:0}}
+.vkrw-sweep{position:absolute;top:0;bottom:0;width:70px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--pulse) 16%,transparent));animation:vkrw-sweep 7s linear infinite 2.6s;left:-70px}
+@keyframes vkrw-sweep{to{left:100%}}
+.vkrw-hit{fill:transparent;cursor:pointer}
+.vkrw-hit:hover+.vkrw-pk,.vkrw-pk.on{fill:var(--pulse)}
+.vkrw-pk{fill:transparent;transition:fill .15s}
+.vkrw-tip{position:absolute;z-index:3;pointer-events:none;min-width:200px;max-width:300px;background:#0a1530;border:1px solid color-mix(in srgb,var(--pulse) 45%,var(--line));
+  border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.4;box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:0;transform:translateY(4px);transition:.12s}
+.vkrw-tip.on{opacity:1;transform:none}
+.vkrw-tip b{display:block;color:var(--pulse);font-weight:600;margin-bottom:4px}
+.vkrw-tip div{color:var(--text)}
+.vkrw-tip small{color:var(--muted)}
+.vkrw-axis{display:flex;justify-content:space-between;padding:6px 22px 0;font-size:13px;color:var(--muted)}
+
+.vkrw-vitals{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:14px}
+.vkrw-vitals>div{padding:18px 22px 20px;border-left:1px solid var(--line)}
+.vkrw-vitals>div:first-child{border-left:0}
+.vkrw-num{font-size:clamp(34px,4.2vw,52px);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:#fff}
+.vkrw-vitals>div:first-child .vkrw-num{color:var(--glow);text-shadow:0 0 22px color-mix(in srgb,var(--glow) 60%,transparent)}
+.vkrw-vl{display:block;font-size:14px;color:var(--muted);margin-top:8px;line-height:1.35;max-width:22ch}
+
+/* isi */
+.vkrw h2{font-size:26px;font-weight:700;letter-spacing:-.01em;color:#fff;margin:0 0 6px}
+.vkrw-sub{color:var(--muted);font-size:15px;margin:0 0 18px;max-width:70ch}
+.vkrw-sec{margin-top:56px}
+.vkrw-two{display:grid;grid-template-columns:1.55fr 1fr;gap:40px;margin-top:56px}
+
+.vkrw-latest{list-style:none;margin:0;padding:0}
+.vkrw-latest li{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.vkrw-av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:17px;color:#fff;
+  background:color-mix(in srgb,var(--glow) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--glow) 25%,var(--line))}
+.vkrw-latest .t{font-weight:600;color:var(--text);line-height:1.3;overflow-wrap:anywhere}
+.vkrw-latest .g{font-size:14px;color:var(--muted)}
+.vkrw-latest time{font-size:14px;color:var(--muted);text-align:right;white-space:nowrap}
+.vkrw-new{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700;color:#fff;background:var(--pulse);box-shadow:0 0 12px -2px var(--pulse);vertical-align:2px}
+
+.vkrw-bars{list-style:none;margin:0;padding:0}
+.vkrw-bars li{display:grid;grid-template-columns:minmax(90px,140px) 1fr 32px;gap:12px;align-items:center;padding:8px 0;font-size:15px}
+.vkrw-bars .bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden}
+.vkrw-bars .bar i{display:block;height:100%;border-radius:6px;background:var(--glow);box-shadow:0 0 12px var(--glow)}
+.vkrw-bars b{text-align:right;font-variant-numeric:tabular-nums}
+.vkrw-bars span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.vkrw-month{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;align-items:end;height:180px;padding-top:24px;border-bottom:1px solid var(--line)}
+.vkrw-month div{position:relative;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--glow),color-mix(in srgb,var(--glow) 25%,transparent));min-height:2px;
+  box-shadow:0 0 18px -4px var(--glow)}
+.vkrw-month div span{position:absolute;top:-22px;left:0;right:0;text-align:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
+.vkrw-mlab{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;font-size:13px;color:var(--muted);text-align:center;padding-top:6px}
+
+.vkrw-tools{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.vkrw-tools input,.vkrw-tools select{font:inherit;font-size:15px;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.vkrw-tools input{flex:1 1 260px}
+.vkrw-tbl{width:100%;border-collapse:collapse;font-size:15px}
+.vkrw-tbl th{text-align:left;font-weight:600;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line)}
+.vkrw-tbl td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.vkrw-tbl td:first-child{white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+.vkrw-tbl td:nth-child(2){white-space:nowrap}
+.vkrw-tbl td:nth-child(3){overflow-wrap:anywhere}
+.vkrw-tbl tr:hover td{background:color-mix(in srgb,var(--glow) 4%,transparent)}
+.vkrw-btn{font:inherit;font-weight:600;font-size:15px;color:var(--bg);background:var(--glow);border:0;border-radius:10px;padding:10px 18px;cursor:pointer;margin-top:16px;
+  box-shadow:0 0 24px -6px var(--glow)}
+.vkrw-btn[hidden]{display:none}
+.vkrw-empty{color:var(--muted);padding:18px 12px}
+
+.vkrw-org .d{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.vkrw-chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:99px;font-size:13px;font-weight:600;white-space:nowrap;border:1px solid var(--line);color:var(--muted)}
+.vkrw-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.vkrw-chip.danger{color:var(--pulse);border-color:color-mix(in srgb,var(--pulse) 45%,transparent);box-shadow:0 0 14px -6px var(--pulse)}
+.vkrw-chip.warn{color:var(--glow);border-color:color-mix(in srgb,var(--glow) 45%,transparent)}
+.vkrw-chip.ok{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent)}
+.vkrw-chip.limited{color:#e9f1ff;border-color:rgba(233,241,255,.3)}
+.vkrw-chip.none::before{background:transparent;border:1px solid currentColor}
+.vkrw-tbl tr.r{cursor:pointer}
+.vkrw-tbl tr.r td:last-child{text-align:right}
+.vkrw-tbl tr.r[aria-expanded=true] td{background:color-mix(in srgb,var(--glow) 6%,transparent);border-bottom-color:transparent}
+.vkrw-tbl tr.x td{padding:4px 12px 18px;background:color-mix(in srgb,var(--glow) 6%,transparent);white-space:normal;color:var(--text)}
+.vkrw-x{display:grid;grid-template-columns:1.1fr 1fr;gap:24px}
+.vkrw-x h3{font-size:15px;font-weight:700;color:#fff;margin:0 0 8px}
+.vkrw-x p{margin:0 0 8px;font-size:15px;color:var(--muted)}
+.vkrw-x dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:15px}
+.vkrw-x dt{color:var(--muted)} .vkrw-x dd{margin:0}
+.vkrw-cat{list-style:none;margin:0;padding:0;font-size:14px}
+.vkrw-cat li{display:grid;grid-template-columns:1fr 90px 40px;gap:10px;align-items:center;padding:3px 0}
+.vkrw-cat .bar{height:6px;border-radius:4px;background:var(--line);overflow:hidden}
+.vkrw-cat .bar i{display:block;height:100%;background:var(--pulse)}
+.vkrw-cat b{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.vkrw-legend{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:0 0 14px;font-size:14px;color:var(--muted)}
+.vkrw-prose{max-width:72ch}
+.vkrw-cols{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:56px}
+.vkrw-cols .vkrw-sec{margin-top:0}
+.vkrw-prose p{margin:0 0 14px}
+.vkrw-steps{counter-reset:s;list-style:none;padding:0;margin:8px 0 18px;max-width:72ch}
+.vkrw-steps li{counter-increment:s;position:relative;padding:0 0 14px 46px}
+.vkrw-steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;
+  color:var(--glow);border:1px solid color-mix(in srgb,var(--glow) 50%,var(--line));box-shadow:0 0 14px -4px var(--glow)}
+.vkrw details{max-width:72ch;border:1px solid var(--line);border-radius:12px;padding:4px 18px;background:color-mix(in srgb,var(--panel) 60%,transparent)}
+.vkrw summary{cursor:pointer;font-weight:600;padding:12px 0;color:var(--text)}
+.vkrw details ul{margin:0 0 14px;padding-left:20px;color:var(--muted)}
+.vkrw details li{margin-bottom:8px}
+.vkrw-foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+.vkrw-err{border:1px solid var(--pulse);border-radius:12px;padding:14px 16px;color:var(--text);margin:16px 0}
+
+@media (max-width:860px){
+  .vkrw-two,.vkrw-cols,.vkrw-x{grid-template-columns:1fr}
+  .vkrw-vitals{grid-template-columns:1fr 1fr}
+  .vkrw-vitals>div:nth-child(3){border-left:0}
+  .vkrw-vitals>div:nth-child(n+3){border-top:1px solid var(--line)}
+  .vkrw-ecg{height:150px}
+  .vkrw-month{gap:4px}.vkrw-mlab{gap:4px;font-size:11px}
+  .vkrw-month div span{font-size:11px}
+  .vkrw-tbl,.vkrw-tbl tbody{display:block;width:100%}
+  .vkrw-tbl thead{display:none}
+  .vkrw-x p{overflow-wrap:anywhere}
+  .vkrw-cat li{grid-template-columns:1fr 64px 38px}
+  .vkrw-tbl tr.r{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .vkrw-tbl tr.r td{border:0;padding:0}
+  .vkrw-tbl tr.r td:nth-child(2){text-align:right;color:var(--muted)}
+  .vkrw-tbl tr.r td:nth-child(3){grid-column:1/-1;font-weight:600}
+  .vkrw-tbl tr.r td:last-child{grid-column:1/-1;text-align:left}
+  .vkrw-tbl tr.x{display:block}.vkrw-tbl tr.x td{display:block;padding:10px 0 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .vkrw-dot,.vkrw-sweep{animation:none}
+  .vkrw-sweep{display:none}
+  .vkrw-trace.draw{animation:none;stroke-dashoffset:0}
+}
+</style>
+
+<section class="vkrw" id="vkrw" aria-labelledby="vkrw-h1">
+ <div class="vkrw-in">
+
+  <header class="vkrw-head">
+   <div>
+    <h1 id="vkrw-h1">Pelacak Ransomware Indonesia</h1>
+    <p class="vkrw-lede">Kelompok ransomware dan pemeras data mengumumkan korbannya di situs kebocoran untuk menekan korban agar membayar. Halaman ini merangkum klaim terhadap organisasi Indonesia dalam 12 bulan terakhir dan diperbarui otomatis setiap 6 jam. <strong>Semua nama adalah klaim pelaku yang belum terverifikasi</strong>, bukan kepastian bahwa organisasi tersebut benar diretas.</p>
+   </div>
+   <div class="vkrw-live" aria-live="polite"><span class="vkrw-dot" aria-hidden="true"></span><span id="vkrw-upd">Memuat data terbaru…</span></div>
+  </header>
+
+  <div class="vkrw-mon" role="figure" aria-labelledby="vkrw-mon-cap">
+   <div class="vkrw-mon-top"><span id="vkrw-mon-cap">Detak klaim terhadap organisasi Indonesia, 90 hari terakhir</span><span id="vkrw-mon-n"></span></div>
+   <div class="vkrw-ecg" id="vkrw-ecg"><div class="vkrw-sweep" aria-hidden="true"></div><div class="vkrw-tip" id="vkrw-tip" role="tooltip"></div></div>
+   <div class="vkrw-axis" aria-hidden="true"><span id="vkrw-ax0"></span><span id="vkrw-ax1"></span><span>hari ini</span></div>
+   <div class="vkrw-vitals">
+    <div><span class="vkrw-num" data-k="orgs_365">–</span><span class="vkrw-vl">organisasi Indonesia diklaim dalam 12 bulan</span></div>
+    <div><span class="vkrw-num" data-k="orgs_90">–</span><span class="vkrw-vl">organisasi diklaim dalam 90 hari terakhir</span></div>
+    <div><span class="vkrw-num" data-k="orgs_30">–</span><span class="vkrw-vl">organisasi diklaim dalam 30 hari terakhir</span></div>
+    <div><span class="vkrw-num" data-k="groups_365">–</span><span class="vkrw-vl">kelompok pelaku berbeda dalam 12 bulan</span></div>
+   </div>
+  </div>
+  <div id="vkrw-err"></div>
+
+  <div class="vkrw-two">
+   <div>
+    <h2>Klaim terbaru</h2>
+    <p class="vkrw-sub">Enam unggahan terakhir yang menyebut organisasi Indonesia.</p>
+    <ul class="vkrw-latest" id="vkrw-latest"></ul>
+   </div>
+   <div>
+    <h2>Kelompok paling aktif</h2>
+    <p class="vkrw-sub">Jumlah klaim terhadap organisasi Indonesia per kelompok, 12 bulan.</p>
+    <ul class="vkrw-bars" id="vkrw-bars"></ul>
+   </div>
+  </div>
+
+  <div class="vkrw-sec">
+   <h2>Klaim per bulan</h2>
+   <p class="vkrw-sub" id="vkrw-gl">Jumlah klaim terhadap organisasi Indonesia per bulan.</p>
+   <div class="vkrw-month" id="vkrw-month"></div>
+   <div class="vkrw-mlab" id="vkrw-mlab"></div>
+  </div>
+
+  <div class="vkrw-sec">
+   <h2>Daftar klaim</h2>
+   <p class="vkrw-sub">Judul ditulis sesuai unggahan pelaku. Vaksincom tidak menautkan ke situs kebocoran pelaku dan tidak menyebarkan data yang dibocorkan. Klik baris untuk melihat situs organisasi dan penilaian keamanannya dari Vaksin Site Intel.</p>
+   <div class="vkrw-legend" aria-label="Arti status Site Intel"><span>Status Site Intel:</span>
+    <span class="vkrw-chip danger">Rawan</span><span class="vkrw-chip warn">Waspada</span><span class="vkrw-chip ok">Baik</span><span class="vkrw-chip limited">Terbatas</span><span class="vkrw-chip none">Belum dipindai</span></div>
+   <div class="vkrw-tools">
+    <label class="vkrw-sr" for="vkrw-q" style="position:absolute;left:-9999px">Cari organisasi</label>
+    <input id="vkrw-q" type="search" placeholder="Cari nama organisasi atau domain">
+    <label for="vkrw-g" style="position:absolute;left:-9999px">Saring kelompok</label>
+    <select id="vkrw-g"><option value="">Semua kelompok</option></select>
+   </div>
+   <table class="vkrw-tbl">
+    <thead><tr><th scope="col">Terdeteksi</th><th scope="col">Kelompok</th><th scope="col">Organisasi dan situs</th><th scope="col" style="text-align:right">Site Intel</th></tr></thead>
+    <tbody id="vkrw-rows"></tbody>
+   </table>
+   <button class="vkrw-btn" id="vkrw-more" type="button" hidden>Tampilkan 20 lagi</button>
+  </div>
+
+  <div class="vkrw-cols">
+  <div class="vkrw-sec vkrw-prose">
+   <h2>Apa artinya</h2>
+   <p id="vkrw-mean">Korban di Indonesia tersebar dari BUMN, bank perkreditan rakyat, kementerian, pemerintah daerah, rumah sakit, kampus, sekolah, sampai koperasi. Tidak ada sektor yang terlalu kecil untuk diincar.</p>
+   <p>Tidak semua klaim berarti data dienkripsi. Sebagian kelompok hanya mencuri dan menjual data, dan sebagian klaim bisa dilebih-lebihkan atau memakai data lama untuk menekan korban.</p>
+  </div>
+
+  <div class="vkrw-sec">
+   <h2>Jika organisasi Anda muncul di daftar</h2>
+   <ol class="vkrw-steps">
+    <li>Jangan panik dan jangan langsung membayar. Pembayaran tidak menjamin data dihapus atau sistem pulih.</li>
+    <li>Verifikasi klaimnya: periksa log, akses tidak wajar, dan contoh data yang ditampilkan pelaku.</li>
+    <li>Isolasi dan pulihkan sistem yang terdampak dari backup yang bersih dan terpisah dari jaringan.</li>
+    <li>Laporkan ke BSSN dan aparat penegak hukum.</li>
+    <li>Beri tahu subjek data bila data pribadi bocor. UU Pelindungan Data Pribadi Pasal 46 mewajibkan pemberitahuan tertulis paling lambat 3 x 24 jam.</li>
+   </ol>
+   <p class="vkrw-prose">Salah satu pintu masuk serangan adalah server yang tidak di-patch. Lihat juga <a href="/data/php-indonesia">Status PHP Indonesia: server rentan PHP2Shell</a>.</p>
+  </div>
+  </div>
+
+  <div class="vkrw-sec">
+   <details>
+    <summary>Metodologi dan batasan data</summary>
+    <ul>
+     <li>Data diambil otomatis setiap 6 jam dari RansomLook, yang memantau situs kebocoran data kelompok ransomware dan pemeras data.</li>
+     <li>Sumber data tidak mencatat negara korban. Korban Indonesia dikenali dari judul dan deskripsi unggahan: domain .id, kata Indonesia, nama kota, PT, Tbk, serta nama instansi seperti kementerian, kabupaten, atau rumah sakit. Unggahan yang hanya menyebut Indonesia secara sambil lalu ditahan untuk diperiksa manual dan tidak langsung tampil.</li>
+     <li>Korban tanpa penanda tersebut tidak tertangkap, jadi angka sebenarnya kemungkinan lebih tinggi. Deteksi otomatis juga bisa keliru; laporan koreksi dapat dikirim ke Vaksincom.</li>
+     <li>Satu organisasi yang diklaim beberapa kali dihitung satu kali dalam jumlah organisasi, tetapi setiap klaim tetap ditampilkan di daftar.</li>
+     <li>Tanggal adalah waktu unggahan terdeteksi, bukan waktu serangan.</li>
+     <li>Situs organisasi diambil dari judul atau deskripsi unggahan pelaku, lalu dapat dikoreksi manual. Situs yang tidak bisa dipastikan tidak ditampilkan.</li>
+     <li>Penilaian Vaksin Site Intel memakai pemeriksaan pasif dari internet, tanpa memindai aktif atau mencoba menembus sistem. Penilaian menggambarkan kondisi situs saat dipindai, bukan penyebab serangan, dan tidak menampilkan detail teknis celah agar tidak dapat disalahgunakan.</li>
+    </ul>
+   </details>
+   <p class="vkrw-foot">Sumber data: <a href="https://www.ransomlook.io" rel="noopener" target="_blank">RansomLook</a>, lisensi <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener" target="_blank">CC BY 4.0</a>. Analisis dan pengolahan: Vaksincom.</p>
+  </div>
+
+ </div>
+</section>
+
+<script>
+(function(){
+  var DATA_URL = "https://alfonstan.github.io/vaksin-ransomware-id/data/ransomware-id.json";
+  var INTEL_URL = "https://siteintel.vaksin.com/public/ransomware-intel.json"; /* ringkasan Site Intel per domain */
+  var INTEL = {};
+  var RATING = {danger:["danger","Rawan","Ditemukan jalur masuk yang sering dipakai ransomware atau celah serius yang terlihat dari internet."],
+    warn:["warn","Waspada","Ada kelemahan yang perlu dibenahi, tetapi tidak ditemukan jalur masuk ransomware yang terbuka."],
+    ok:["ok","Baik","Tidak ditemukan jalur masuk ransomware yang umum dari pemeriksaan pasif."],
+    limited:["limited","Terbatas","Server berada di balik layanan proteksi (CDN), sehingga hanya sebagian yang dapat dinilai. Tidak terlihat belum tentu aman."]};
+  var root = document.getElementById("vkrw"); if(!root) return;
+  var $ = function(id){return document.getElementById(id)};
+  var BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  var DAY = 864e5;
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function wib(d){return new Date(d.getTime()+7*3600e3)}
+  function tgl(iso){var d=wib(new Date(iso));return d.getUTCDate()+" "+BLN[d.getUTCMonth()]+" "+d.getUTCFullYear()}
+  function rel(iso){
+    var m=(Date.now()-new Date(iso))/6e4;
+    if(m<60) return Math.max(1,Math.round(m))+" menit lalu";
+    if(m<1440) return Math.round(m/60)+" jam lalu";
+    var d=Math.round(m/1440); return d<31? d+" hari lalu" : tgl(iso);
+  }
+  function fmt(n){return Number(n).toLocaleString("id-ID")}
+  function initials(t){
+    var w=t.replace(/^(pt\.?|www\.)\s*/i,"").replace(/[^A-Za-z0-9 ]/g," ").trim().split(/\s+/);
+    return ((w[0]||"?")[0]+((w[1]||"")[0]||"")).toUpperCase();
+  }
+  function countUp(el,to){
+    if(matchMedia("(prefers-reduced-motion: reduce)").matches){el.textContent=fmt(to);return}
+    var t0=performance.now(),dur=1400;
+    (function f(t){var p=Math.min(1,(t-t0)/dur);el.textContent=fmt(Math.round(to*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(f)})(t0);
+  }
+
+  /* monitor detak: tiap hari ada klaim = satu lonjakan */
+  function drawEcg(victims){
+    var box=$("vkrw-ecg"), W=1000, H=200, mid=H*0.62, days=90, now=Date.now();
+    var per={};
+    victims.forEach(function(v){var a=Math.floor((now-new Date(v.date))/DAY); if(a>=0&&a<days){(per[a]=per[a]||[]).push(v)}});
+    var max=1; for(var k in per) max=Math.max(max,per[k].length);
+    var step=W/days, pts=[[0,mid]], peaks=[];
+    for(var i=days-1;i>=0;i--){
+      var x=(days-1-i)*step, list=per[i];
+      if(list){
+        var h=(0.38+0.6*list.length/max)*(mid-10);
+        var cx=x+step/2;
+        pts.push([cx-step*0.45,mid],[cx-step*0.3,mid+8],[cx-step*0.1,mid-h],[cx+step*0.12,mid+h*0.28],[cx+step*0.3,mid-6],[cx+step*0.45,mid]);
+        peaks.push({x:cx,y:mid-h,day:i,list:list});
+      } else {
+        pts.push([x+step*0.5,mid+(i%7===3?-3:0)],[x+step,mid]);
+      }
+    }
+    var d="M"+pts.map(function(p){return p[0].toFixed(1)+" "+p[1].toFixed(1)}).join(" L");
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true"><path class="vkrw-trace" d="'+d+'" vector-effect="non-scaling-stroke"/>';
+    peaks.forEach(function(p,ix){
+      svg+='<rect class="vkrw-hit" data-i="'+ix+'" x="'+(p.x-step*0.7)+'" y="0" width="'+(step*1.4)+'" height="'+H+'"/>';
+      svg+='<circle class="vkrw-pk" cx="'+p.x+'" cy="'+p.y+'" r="3.5"/>';
+    });
+    svg+="</svg>";
+    box.insertAdjacentHTML("beforeend",svg);
+    var path=box.querySelector(".vkrw-trace");
+    try{var L=path.getTotalLength();path.style.setProperty("--len",L);path.classList.add("draw")}catch(e){}
+    var tip=$("vkrw-tip");
+    box.querySelectorAll(".vkrw-hit").forEach(function(r){
+      function show(){
+        var p=peaks[+r.dataset.i], bb=box.getBoundingClientRect(), x=p.x/W*bb.width;
+        tip.innerHTML="<b>"+tgl(p.list[0].date)+"</b>"+p.list.slice(0,4).map(function(v){return "<div>"+esc(v.title)+" <small>("+esc(v.group)+")</small></div>"}).join("")+(p.list.length>4?"<small>+"+(p.list.length-4)+" lainnya</small>":"");
+        tip.style.left=Math.min(Math.max(8,x-110),bb.width-230)+"px"; tip.style.top=Math.max(4,p.y/H*bb.height-tip.offsetHeight-14)+"px";
+        tip.classList.add("on");
+      }
+      r.addEventListener("mouseenter",show); r.addEventListener("click",show);
+      r.addEventListener("mouseleave",function(){tip.classList.remove("on")});
+    });
+    var n=0; for(var k2 in per) n+=per[k2].length;
+    $("vkrw-mon-n").textContent=n+" klaim";
+    $("vkrw-ax0").textContent=tgl(new Date(now-89*DAY).toISOString());
+    $("vkrw-ax1").textContent=tgl(new Date(now-45*DAY).toISOString());
+  }
+
+  function render(data){
+    var V=data.victims||[], S=data.stats||{};
+    $("vkrw-upd").innerHTML="Diperbarui <b>"+rel(data.generated_at)+"</b>"+(data.latest_detection?", klaim terakhir "+tgl(data.latest_detection):"");
+    root.querySelectorAll("[data-k]").forEach(function(el){countUp(el,S[el.dataset.k]||0)});
+    drawEcg(V);
+
+    /* klaim terbaru */
+    $("vkrw-latest").innerHTML=V.slice(0,6).map(function(v){
+      var isNew=(Date.now()-new Date(v.date))<7*DAY;
+      return '<li><span class="vkrw-av" aria-hidden="true">'+esc(initials(v.title))+'</span><div><div class="t">'+esc(v.title)+(isNew?'<span class="vkrw-new">baru</span>':'')+'</div><div class="g">'+esc(v.group)+'</div></div><time datetime="'+v.date+'">'+rel(v.date)+'</time></li>';
+    }).join("") || '<li class="vkrw-empty">Belum ada klaim tercatat.</li>';
+
+    /* kelompok */
+    var tg=data.top_groups||[], tmax=tg.length?tg[0].count:1;
+    $("vkrw-bars").innerHTML=tg.map(function(g){return '<li><span title="'+esc(g.group)+'">'+esc(g.group)+'</span><span class="bar"><i style="width:'+(g.count/tmax*100)+'%"></i></span><b>'+g.count+'</b></li>'}).join("");
+
+    /* bulanan */
+    var M=data.monthly||[], mmax=Math.max.apply(null,M.map(function(m){return m.count}).concat([1]));
+    $("vkrw-month").innerHTML=M.map(function(m){var mo=+m.month.slice(5)-1;return '<div style="height:'+Math.max(1,m.count/mmax*100)+'%" title="'+BLN[mo]+" "+m.month.slice(0,4)+": "+m.count+' klaim"><span>'+m.count+'</span></div>'}).join("");
+    $("vkrw-mlab").innerHTML=M.map(function(m){return "<span>"+BLN[+m.month.slice(5)-1]+"</span>"}).join("");
+    if(S.global_365 && S.global_days_covered>=330){
+      $("vkrw-gl").textContent="Jumlah klaim terhadap organisasi Indonesia per bulan. Sebagai pembanding, tercatat "+fmt(S.global_365)+" unggahan korban di seluruh dunia dalam 12 bulan yang sama.";
+    }
+
+    /* apa artinya: kalimat dari data */
+    if(tg.length>=3){
+      var byOrg={}; V.forEach(function(v){(byOrg[v.org]=byOrg[v.org]||{t:v.title,g:{}}).g[v.group]=1});
+      var multi=Object.keys(byOrg).map(function(k){return {t:byOrg[k].t,n:Object.keys(byOrg[k].g).length}}).filter(function(o){return o.n>=2}).sort(function(a,b){return b.n-a.n});
+      $("vkrw-mean").textContent="Korban di Indonesia tersebar dari BUMN, bank perkreditan rakyat, kementerian, pemerintah daerah, rumah sakit, kampus, sekolah, sampai koperasi. Tidak ada sektor yang terlalu kecil untuk diincar. Dalam 12 bulan terakhir, "+tg[0].group+" paling sering mengklaim korban Indonesia ("+tg[0].count+" klaim), disusul "+tg[1].group+" ("+tg[1].count+") dan "+tg[2].group+" ("+tg[2].count+")."+(multi.length?" "+multi[0].t.replace(/^PT\.?\s+/i,"")+" bahkan diklaim oleh "+multi[0].n+" kelompok berbeda.":"");
+    }
+
+    /* tabel */
+    var groups={}; V.forEach(function(v){groups[v.group]=(groups[v.group]||0)+1});
+    $("vkrw-g").insertAdjacentHTML("beforeend",Object.keys(groups).sort().map(function(g){return '<option value="'+esc(g)+'">'+esc(g)+" ("+groups[g]+")</option>"}).join(""));
+    var shown=20, open=null;
+    function intelOf(v){return v.domain&&INTEL[v.domain]}
+    function chip(v){
+      if(!v.domain) return '<span class="vkrw-chip none" title="Situs organisasi belum dapat dipastikan">Situs belum diketahui</span>';
+      var i=intelOf(v), r=i&&RATING[i.rating];
+      return r?'<span class="vkrw-chip '+r[0]+'">'+r[1]+'</span>':'<span class="vkrw-chip none">Belum dipindai</span>';
+    }
+    function detail(v){
+      var i=intelOf(v), r=i&&RATING[i.rating], h='<div class="vkrw-x"><div><h3>Situs organisasi</h3>';
+      h+= v.domain ? '<dl><dt>Domain</dt><dd>'+esc(v.domain)+'</dd><dt>Diklaim oleh</dt><dd>'+esc(v.group)+', '+tgl(v.date)+'</dd></dl>'
+                   : '<p>Situs organisasi ini belum dapat dipastikan dari unggahan pelaku.</p>';
+      h+='</div><div><h3>Penilaian Vaksin Site Intel</h3>';
+      if(r){
+        h+='<p><span class="vkrw-chip '+r[0]+'">'+r[1]+'</span> '+r[2]+'</p>';
+        if(i.email_spoofable!=null) h+='<p>Email: '+(i.email_spoofable?'domain dapat dipalsukan untuk email penipuan.':'terlindungi dari pemalsuan pengirim.')+'</p>';
+        if(i.categories&&i.categories.length) h+='<ul class="vkrw-cat">'+i.categories.map(function(c){return '<li><span>'+esc(c.name)+'</span><span class="bar"><i style="width:'+c.pct+'%"></i></span><b>'+c.pct+'%</b></li>'}).join("")+'</ul>';
+        h+='<p>Dipindai '+tgl(i.scanned_at)+'. <a href="/site-intel">Minta laporan lengkap Site Intel</a></p>';
+      } else {
+        h+= v.domain ? '<p>Situs ini belum dipindai. Pemindaian berjalan bertahap untuk korban terbaru.</p>' : '<p>Penilaian membutuhkan situs organisasi.</p>';
+        h+='<p><a href="/site-intel">Pelajari Vaksin Site Intel</a></p>';
+      }
+      return h+'</div></div>';
+    }
+    function table(){
+      var q=$("vkrw-q").value.trim().toLowerCase(), g=$("vkrw-g").value;
+      var rows=V.filter(function(v){return (!g||v.group===g)&&(!q||(v.title+" "+v.group+" "+(v.domain||"")).toLowerCase().indexOf(q)>=0)});
+      $("vkrw-rows").innerHTML=rows.slice(0,shown).map(function(v){
+        var o=open===v.id;
+        return '<tr class="r" tabindex="0" data-id="'+v.id+'" aria-expanded="'+o+'"><td>'+tgl(v.date)+'</td><td>'+esc(v.group)+'</td><td class="vkrw-org">'+esc(v.title)+(v.domain&&v.domain.toLowerCase()!==v.title.toLowerCase().replace(/^www\./,"")?'<span class="d">'+esc(v.domain)+'</span>':'')+'</td><td>'+chip(v)+'</td></tr>'+(o?'<tr class="x"><td colspan="4">'+detail(v)+'</td></tr>':'');
+      }).join("")||'<tr><td colspan="4" class="vkrw-empty">Tidak ada klaim yang cocok. Coba kata kunci lain atau pilih semua kelompok.</td></tr>';
+      var b=$("vkrw-more"); b.hidden=rows.length<=shown; b.textContent="Tampilkan "+Math.min(20,rows.length-shown)+" lagi";
+    }
+    $("vkrw-q").addEventListener("input",function(){shown=20;table()});
+    $("vkrw-g").addEventListener("change",function(){shown=20;table()});
+    $("vkrw-more").addEventListener("click",function(){shown+=20;table()});
+    function toggle(e){var tr=e.target.closest("tr.r");if(!tr||e.target.closest("a"))return;if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();open=open===tr.dataset.id?null:tr.dataset.id;table();var n=$("vkrw-rows").querySelector('tr[data-id="'+tr.dataset.id+'"]');if(n)n.focus()}
+    $("vkrw-rows").addEventListener("click",toggle);$("vkrw-rows").addEventListener("keydown",toggle);
+    table();
+  }
+
+  var bust=Math.floor(Date.now()/9e5); /* cache 15 menit */
+  var intelP=fetch(INTEL_URL+"?v="+bust).then(function(r){return r.ok?r.json():{}}).then(function(j){INTEL=(j&&j.domains)||{}}).catch(function(){});
+  fetch(DATA_URL+"?v="+bust,{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
+  .then(function(d){return intelP.then(function(){return d})})
+  .then(render).catch(function(e){
+    $("vkrw-upd").textContent="Data tidak dapat dimuat";
+    $("vkrw-err").innerHTML='<p class="vkrw-err">Data klaim tidak dapat dimuat ('+esc(e.message)+'). Muat ulang halaman ini dalam beberapa menit; bila masih gagal, hubungi Vaksincom.</p>';
+  });
+  window.__vkrwRender=render; /* untuk preview */
+})();
+</script>
