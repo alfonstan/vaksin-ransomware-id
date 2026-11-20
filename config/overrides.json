@@ -1,5 +1,8 @@
 {
  "_petunjuk": "include: pola (regex, tidak peka huruf besar) judul unggahan yang PASTI korban Indonesia walau tidak terdeteksi otomatis. exclude: pola judul yang salah terdeteksi dan harus disembunyikan. Lihat state/review.json untuk kandidat yang perlu dicek manual.",
  "include": [],
- "exclude": []
+ "exclude": [
+  "^Company #\\d+$"
+ ],
+ "_catatan_exclude": "Company #N: unggahan anonim tanpa nama organisasi (tidak bisa diverifikasi)."
 }

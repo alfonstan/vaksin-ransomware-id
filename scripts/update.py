@@ -175,6 +175,37 @@ def find_domain(title, desc):
     return None, None
 
 
+def _same_claim(a, b):
+    """Klaim yang sama dari kelompok yang sama (judul bisa beda: 'NEW', '(FF)', 'Database Leaked')."""
+    if a["group"] != b["group"]:
+        return False
+    da, db_ = parse_dt(a["date"]), parse_dt(b["date"])
+    if abs((da - db_).days) > 45:
+        return False
+    ka, kb = a["org"], b["org"]
+    if not re.search(r"[a-z]", ka) or not re.search(r"[a-z]", kb):  # judul tanpa nama, mis. bendera saja
+        return da.date() == db_.date()
+    short, long_ = sorted((ka, kb), key=len)
+    if len(short) < 3:
+        return False
+    return short == long_ or re.search(rf"(?:^| ){re.escape(short)}(?: |$)", long_) is not None
+
+
+def merge_dupes(victims):
+    """Gabungkan klaim ganda. Entri kurasi/manual menang (judulnya sudah dirapikan);
+    domain dari entri otomatis diwariskan bila entri yang dipertahankan belum punya."""
+    rank = {"manual": 0, "kurasi": 1}
+    ordered = sorted(victims, key=lambda v: (rank.get(v.get("via"), 2), v["date"]))
+    kept = []
+    for v in ordered:
+        twin = next((k for k in kept if _same_claim(k, v)), None)
+        if twin is None:
+            kept.append(v)
+        elif v.get("domain") and not twin.get("domain"):
+            twin["domain"], twin["domain_via"] = v["domain"], v.get("domain_via")
+    return kept
+
+
 def vid(group, title, date):
     return hashlib.sha1(f"{group}|{title}|{date[:10]}".encode()).hexdigest()[:12]
 
@@ -267,6 +298,8 @@ def main():
 
     # buang yang dikecualikan belakangan via overrides
     victims = [v for v in victims if not any(rx.search(v["title"]) for rx in overrides["exclude"])]
+
+    victims = merge_dupes(victims)
 
     # domain: koreksi manual (config/domains.json: {"kunci org": "domain.co.id"}) menang atas otomatis
     dmap = {k: v for k, v in load(CONFIG / "domains.json", {}).items() if not k.startswith("_")}
