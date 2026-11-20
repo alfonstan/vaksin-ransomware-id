@@ -12,7 +12,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;900&display=swap" rel="stylesheet">
 
+<div id="vkrw-host" style="display:block"></div>
+<template id="vkrw-tpl">
 <style>
+:host{display:block}
 .vkrw{
   --glow:#ffd56a;           /* <<< cahaya ambient & aksen: kuning logo vaksin.com */
   --pulse:#ff4d5e;          /* <<< garis detak, titik LIVE, label "baru" */
@@ -23,6 +26,7 @@
   background:var(--bg); color:var(--text);
   font-family:"Source Sans 3","Source Sans Pro",system-ui,sans-serif;
   font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  text-align:left; font-weight:400; letter-spacing:normal; text-transform:none;
   padding:clamp(28px,5vw,64px) clamp(16px,4vw,48px) 56px;
 }
 .vkrw *{box-sizing:border-box}
@@ -289,6 +293,7 @@
 
  </div>
 </section>
+</template>
 
 <script>
 (function(){
@@ -299,8 +304,13 @@
     warn:["warn","Waspada","Ada kelemahan yang perlu dibenahi, tetapi tidak ditemukan jalur masuk ransomware yang terbuka."],
     ok:["ok","Baik","Tidak ditemukan jalur masuk ransomware yang umum dari pemeriksaan pasif."],
     limited:["limited","Terbatas","Server berada di balik layanan proteksi (CDN), sehingga hanya sebagian yang dapat dinilai. Tidak terlihat belum tentu aman."]};
-  var root = document.getElementById("vkrw"); if(!root) return;
-  var $ = function(id){return document.getElementById(id)};
+  var host = document.getElementById("vkrw-host"), tpl = document.getElementById("vkrw-tpl");
+  if(!host || !tpl) return;
+  /* Shadow DOM: CSS tema Duda tidak bisa mengubah tampilan widget */
+  var sr = host.shadowRoot || host.attachShadow({mode:"open"});
+  if(!sr.getElementById("vkrw")) sr.appendChild(tpl.content.cloneNode(true));
+  var root = sr.getElementById("vkrw"); if(!root) return;
+  var $ = function(id){return sr.getElementById(id)};
   var BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
   var DAY = 864e5;
   function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}

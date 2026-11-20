@@ -23,7 +23,7 @@ pick = '''<div class="pick" aria-label="Pilih warna cahaya (hanya di preview)">W
 <button data-c="#ff4d5e" style="background:#ff4d5e" title="Merah"></button>
 <button data-c="#6f8dff" style="background:#6f8dff" title="Biru"></button>
 <button data-c="#e9f1ff" style="background:#e9f1ff" title="Putih"></button></div>
-<script>document.querySelectorAll(".pick button").forEach(function(b){b.onclick=function(){document.getElementById("vkrw").style.setProperty("--glow",b.dataset.c);document.querySelectorAll(".pick button").forEach(function(x){x.classList.toggle("on",x===b)})}})</script>
+<script>document.querySelectorAll(".pick button").forEach(function(b){b.onclick=function(){document.getElementById("vkrw-host").shadowRoot.getElementById("vkrw").style.setProperty("--glow",b.dataset.c);document.querySelectorAll(".pick button").forEach(function(x){x.classList.toggle("on",x===b)})}})</script>
 </body></html>'''
 import base64
 logo = "data:image/png;base64," + base64.b64encode((R / "preview_logo.png").read_bytes()).decode()
