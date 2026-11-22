@@ -23,6 +23,8 @@
   --st-warn:#ffd56a;        /* status "Waspada": TETAP kuning walau cahaya diganti pengunjung */
   --bg:#0b1230; --panel:#111c42; --line:#1d3263;
   --text:#e8eefc; --muted:#93a6cb;
+  --hd:#fff; --mon1:#0c1738; --mon2:#080f2a; --tipbg:#0a1530; --limited:#e9f1ff; --btnink:var(--bg);
+  --acc:var(--glow);        /* warna aksen untuk teks/batang: di mode siang dipakai versi lebih gelap */
   position:relative; isolation:isolate; overflow:hidden;
   background:var(--bg); color:var(--text);
   font-family:"Source Sans 3","Source Sans Pro",system-ui,sans-serif;
@@ -38,12 +40,12 @@
 .vkrw::after{width:760px;height:760px;right:-280px;top:34%;
   background:radial-gradient(closest-side,color-mix(in srgb,var(--glow) 22%,transparent),transparent)}
 .vkrw-in{max-width:1180px;margin:0 auto}
-.vkrw a{color:var(--glow);text-underline-offset:3px}
+.vkrw a{color:var(--acc);text-underline-offset:3px}
 .vkrw a:focus-visible,.vkrw button:focus-visible,.vkrw input:focus-visible,.vkrw select:focus-visible{outline:2px solid var(--glow);outline-offset:3px}
 
 /* kepala */
 .vkrw-head{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
-.vkrw h1{font-size:clamp(34px,5.4vw,60px);line-height:1.02;font-weight:900;letter-spacing:-.02em;margin:0 0 14px;color:#fff}
+.vkrw h1{font-size:clamp(34px,5.4vw,60px);line-height:1.02;font-weight:900;letter-spacing:-.02em;margin:0 0 14px;color:var(--hd)}
 .vkrw-lede{max-width:62ch;color:var(--muted);margin:0}
 .vkrw-lede strong{color:var(--text);font-weight:600}
 .vkrw-side{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
@@ -51,8 +53,19 @@
 .vkrw-pick button{width:20px;height:20px;border-radius:50%;padding:0;cursor:pointer;background:var(--c);
   border:2px solid rgba(255,255,255,.18);box-shadow:0 0 10px -2px var(--c);transition:transform .15s,border-color .15s}
 .vkrw-pick button:hover{transform:scale(1.15)}
-.vkrw-pick button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px var(--bg),0 0 14px var(--c)}
+.vkrw-pick button[aria-pressed=true]{border-color:var(--hd);box-shadow:0 0 0 2px var(--bg),0 0 14px var(--c)}
 .vkrw,.vkrw::before,.vkrw::after{transition:background .6s}
+/* Mode siang: dipasang bila situs TIDAK dalam mode malam (class vk-malam di <html>, lihat skrip di bawah) */
+.vkrw.siang{
+  --bg:#f4f7fd; --panel:#ffffff; --line:#d3dbef; --text:#16214a; --muted:#4d5d86;
+  --hd:#0b1230; --mon1:#ffffff; --mon2:#eef2fb; --tipbg:#ffffff; --limited:#3d4a73; --btnink:#ffffff;
+  --pulse:#d6283a; --blue:#3556d6; --st-warn:#9a6200;
+}
+.vkrw.siang::before,.vkrw.siang::after{opacity:.55}
+.vkrw.siang .vkrw-tip{box-shadow:0 10px 30px rgba(11,18,48,.18)}
+.vkrw.siang .vkrw-vitals>div:first-child .vkrw-num{text-shadow:none}
+.vkrw.siang .vkrw-trace{filter:none}
+.vkrw.siang .vkrw-pick button{border-color:rgba(11,18,48,.25)}
 @media (max-width:860px){.vkrw-side{align-items:flex-start}}
 .vkrw-live{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted);white-space:nowrap}
 .vkrw-dot{width:10px;height:10px;border-radius:50%;background:var(--pulse);box-shadow:0 0 0 0 var(--pulse),0 0 14px var(--pulse);animation:vkrw-pulse 2s infinite}
@@ -61,7 +74,7 @@
 
 /* monitor detak — elemen utama */
 .vkrw-mon{position:relative;border:1px solid color-mix(in srgb,var(--glow) 30%,var(--line));border-radius:18px;
-  background:linear-gradient(180deg,#0c1738,#080f2a);
+  background:linear-gradient(180deg,var(--mon1),var(--mon2));
   box-shadow:0 0 0 1px rgba(255,255,255,.02) inset,0 30px 110px -25px color-mix(in srgb,var(--glow) 60%,transparent),0 0 60px -20px color-mix(in srgb,var(--glow) 35%,transparent) inset}
 .vkrw-mon-top{display:flex;justify-content:space-between;gap:12px;padding:16px 22px 0;font-size:14px;color:var(--muted)}
 .vkrw-mon-top span:first-child{color:var(--text);font-weight:600}
@@ -80,7 +93,7 @@
 .vkrw-hit{fill:transparent;cursor:pointer}
 .vkrw-hit:hover+.vkrw-pk,.vkrw-pk.on{fill:var(--pulse)}
 .vkrw-pk{fill:transparent;transition:fill .15s}
-.vkrw-tip{position:absolute;z-index:3;pointer-events:none;min-width:200px;max-width:300px;background:#0a1530;border:1px solid color-mix(in srgb,var(--pulse) 45%,var(--line));
+.vkrw-tip{position:absolute;z-index:3;pointer-events:none;min-width:200px;max-width:300px;background:var(--tipbg);border:1px solid color-mix(in srgb,var(--pulse) 45%,var(--line));
   border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.4;box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:0;transform:translateY(4px);transition:.12s}
 .vkrw-tip.on{opacity:1;transform:none}
 .vkrw-tip b{display:block;color:var(--pulse);font-weight:600;margin-bottom:4px}
@@ -91,19 +104,19 @@
 .vkrw-vitals{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:14px}
 .vkrw-vitals>div{padding:18px 22px 20px;border-left:1px solid var(--line)}
 .vkrw-vitals>div:first-child{border-left:0}
-.vkrw-num{font-size:clamp(34px,4.2vw,52px);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:#fff}
-.vkrw-vitals>div:first-child .vkrw-num{color:var(--glow);text-shadow:0 0 22px color-mix(in srgb,var(--glow) 60%,transparent)}
+.vkrw-num{font-size:clamp(34px,4.2vw,52px);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--hd)}
+.vkrw-vitals>div:first-child .vkrw-num{color:var(--acc);text-shadow:0 0 22px color-mix(in srgb,var(--glow) 60%,transparent)}
 .vkrw-vl{display:block;font-size:14px;color:var(--muted);margin-top:8px;line-height:1.35;max-width:22ch}
 
 /* isi */
-.vkrw h2{font-size:26px;font-weight:700;letter-spacing:-.01em;color:#fff;margin:0 0 6px}
+.vkrw h2{font-size:26px;font-weight:700;letter-spacing:-.01em;color:var(--hd);margin:0 0 6px}
 .vkrw-sub{color:var(--muted);font-size:15px;margin:0 0 18px;max-width:70ch}
 .vkrw-sec{margin-top:56px}
 .vkrw-two{display:grid;grid-template-columns:1.55fr 1fr;gap:40px;margin-top:56px}
 
 .vkrw-latest{list-style:none;margin:0;padding:0}
 .vkrw-latest li{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.vkrw-av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:17px;color:#fff;
+.vkrw-av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:17px;color:var(--hd);
   background:color-mix(in srgb,var(--glow) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--glow) 25%,var(--line))}
 .vkrw-latest .t{font-weight:600;color:var(--text);line-height:1.3;overflow-wrap:anywhere}
 .vkrw-latest .g{font-size:14px;color:var(--muted)}
@@ -113,12 +126,12 @@
 .vkrw-bars{list-style:none;margin:0;padding:0}
 .vkrw-bars li{display:grid;grid-template-columns:minmax(90px,140px) 1fr 32px;gap:12px;align-items:center;padding:8px 0;font-size:15px}
 .vkrw-bars .bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden}
-.vkrw-bars .bar i{display:block;height:100%;border-radius:6px;background:var(--glow);box-shadow:0 0 12px var(--glow)}
+.vkrw-bars .bar i{display:block;height:100%;border-radius:6px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
 .vkrw-bars b{text-align:right;font-variant-numeric:tabular-nums}
 .vkrw-bars span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .vkrw-month{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;align-items:end;height:180px;padding-top:24px;border-bottom:1px solid var(--line)}
-.vkrw-month div{position:relative;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--glow),color-mix(in srgb,var(--glow) 25%,transparent));min-height:2px;
+.vkrw-month div{position:relative;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--acc),color-mix(in srgb,var(--acc) 25%,transparent));min-height:2px;
   box-shadow:0 0 18px -4px var(--glow)}
 .vkrw-month div span{position:absolute;top:-22px;left:0;right:0;text-align:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
 .vkrw-mlab{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;font-size:13px;color:var(--muted);text-align:center;padding-top:6px}
@@ -133,7 +146,7 @@
 .vkrw-tbl td:nth-child(2){white-space:nowrap}
 .vkrw-tbl td:nth-child(3){overflow-wrap:anywhere}
 .vkrw-tbl tr:hover td{background:color-mix(in srgb,var(--glow) 4%,transparent)}
-.vkrw-btn{font:inherit;font-weight:600;font-size:15px;color:var(--bg);background:var(--glow);border:0;border-radius:10px;padding:10px 18px;cursor:pointer;margin-top:16px;
+.vkrw-btn{font:inherit;font-weight:600;font-size:15px;color:var(--btnink);background:var(--acc);border:0;border-radius:10px;padding:10px 18px;cursor:pointer;margin-top:16px;
   box-shadow:0 0 24px -6px var(--glow)}
 .vkrw-btn[hidden]{display:none}
 .vkrw-empty{color:var(--muted);padding:18px 12px}
@@ -144,14 +157,14 @@
 .vkrw-chip.danger{color:var(--pulse);border-color:color-mix(in srgb,var(--pulse) 45%,transparent);box-shadow:0 0 14px -6px var(--pulse)}
 .vkrw-chip.warn{color:var(--st-warn);border-color:color-mix(in srgb,var(--st-warn) 45%,transparent)}
 .vkrw-chip.ok{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent)}
-.vkrw-chip.limited{color:#e9f1ff;border-color:rgba(233,241,255,.3)}
+.vkrw-chip.limited{color:var(--limited);border-color:color-mix(in srgb,var(--limited) 30%,transparent)}
 .vkrw-chip.none::before{background:transparent;border:1px solid currentColor}
 .vkrw-tbl tr.r{cursor:pointer}
 .vkrw-tbl tr.r td:last-child{text-align:right}
 .vkrw-tbl tr.r[aria-expanded=true] td{background:color-mix(in srgb,var(--glow) 6%,transparent);border-bottom-color:transparent}
 .vkrw-tbl tr.x td{padding:4px 12px 18px;background:color-mix(in srgb,var(--glow) 6%,transparent);white-space:normal;color:var(--text)}
 .vkrw-x{display:grid;grid-template-columns:1.1fr 1fr;gap:24px}
-.vkrw-x h3{font-size:15px;font-weight:700;color:#fff;margin:0 0 8px}
+.vkrw-x h3{font-size:15px;font-weight:700;color:var(--hd);margin:0 0 8px}
 .vkrw-x p{margin:0 0 8px;font-size:15px;color:var(--muted)}
 .vkrw-x dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:15px}
 .vkrw-x dt{color:var(--muted)} .vkrw-x dd{margin:0}
@@ -170,7 +183,7 @@
 .vkrw-steps{counter-reset:s;list-style:none;padding:0;margin:8px 0 18px;max-width:72ch}
 .vkrw-steps li{counter-increment:s;position:relative;padding:0 0 14px 46px}
 .vkrw-steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;
-  color:var(--glow);border:1px solid color-mix(in srgb,var(--glow) 50%,var(--line));box-shadow:0 0 14px -4px var(--glow)}
+  color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 50%,var(--line));box-shadow:0 0 14px -4px var(--glow)}
 .vkrw details{max-width:72ch;border:1px solid var(--line);border-radius:12px;padding:4px 18px;background:color-mix(in srgb,var(--panel) 60%,transparent)}
 .vkrw summary{cursor:pointer;font-weight:600;padding:12px 0;color:var(--text)}
 .vkrw details ul{margin:0 0 14px;padding-left:20px;color:var(--muted)}
@@ -337,14 +350,26 @@
 
   /* Pemilih warna cahaya: hanya cahaya ambient & aksen; warna status tetap. */
   var GLOW_KEY = "vk-glow", GLOWS = ["#ffd56a","#ff4d5e","#6f8dff","#e9f1ff"];
+  /* Versi aksen yang cukup kontras di latar terang (mode siang) untuk tiap warna cahaya. */
+  var GLOW_SIANG = {"#ffd56a":"#b37400","#ff4d5e":"#d6283a","#6f8dff":"#3556d6","#e9f1ff":"#1b2a66"};
+  var curGlow = GLOWS[0];
+  /* Mode siang/malam mengikuti situs: skrip di Head situs memasang class "vk-malam" pada <html>. */
+  function applyTheme(){
+    var siang = !document.documentElement.classList.contains("vk-malam");
+    root.classList.toggle("siang", siang);
+    root.style.setProperty("--acc", siang ? GLOW_SIANG[curGlow] : curGlow);
+  }
   function setGlow(c, save){
     if(GLOWS.indexOf(c) < 0) c = GLOWS[0];
+    curGlow = c;
     root.style.setProperty("--glow", c);
+    applyTheme();
     root.querySelectorAll(".vkrw-pick button").forEach(function(b){b.setAttribute("aria-pressed", String(b.dataset.c === c))});
     if(save){ try{ localStorage.setItem(GLOW_KEY, c); }catch(e){} }
   }
   var saved = null; try{ saved = localStorage.getItem(GLOW_KEY); }catch(e){}
   setGlow(saved || GLOWS[0], false);
+  try{ new MutationObserver(applyTheme).observe(document.documentElement, {attributes:true, attributeFilter:["class"]}); }catch(e){}
   root.querySelectorAll(".vkrw-pick button").forEach(function(b){
     b.addEventListener("click", function(){ setGlow(b.dataset.c, true); });
   });
