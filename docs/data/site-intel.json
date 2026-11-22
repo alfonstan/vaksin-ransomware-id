@@ -1,4 +1,9 @@
 {
  "_petunjuk": "Diisi MANUAL setelah hasil scan Site Intel dicek (tidak ada proses otomatis). Kunci = ID korban di ransomware-id.json. Isi publik HANYA rating (danger|warn|ok|limited) dan scanned_at (YYYY-MM-DD). Jangan tambah field lain.",
- "victims": {}
+ "victims": {
+  "972828b3c0de": {
+   "rating": "warn",
+   "scanned_at": "2026-11-22"
+  }
+ }
 }
