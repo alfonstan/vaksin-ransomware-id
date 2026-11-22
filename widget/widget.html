@@ -258,7 +258,7 @@
 
   <div class="vkrw-sec">
    <h2>Daftar klaim</h2>
-   <p class="vkrw-sub">Judul ditulis sesuai unggahan pelaku. Vaksincom tidak menautkan ke situs kebocoran pelaku dan tidak menyebarkan data yang dibocorkan. Klik baris untuk melihat situs organisasi dan penilaian keamanannya dari Vaksin Site Intel.</p>
+   <p class="vkrw-sub">Judul ditulis sesuai unggahan pelaku. Vaksincom tidak menautkan ke situs kebocoran pelaku dan tidak menyebarkan data yang dibocorkan. Klik baris untuk melihat rincian klaim dan status Vaksin Site Intel (berdasarkan pengamatan pasif dari internet). Hak jawab atau koreksi: <a href="mailto:info@vaksin.com">info@vaksin.com</a>.</p>
    <div class="vkrw-legend" aria-label="Arti status Site Intel"><span>Status Site Intel:</span>
     <span class="vkrw-chip danger">Rawan</span><span class="vkrw-chip warn">Waspada</span><span class="vkrw-chip ok">Baik</span><span class="vkrw-chip limited">Terbatas</span><span class="vkrw-chip none">Belum diperiksa</span></div>
    <p class="vkrw-note vkrw-disc">Status Site Intel adalah indikasi kelemahan domain institusi berdasarkan parameter pengukuran Vaksin Site Intel, untuk membantu institusi mengamankan jaringannya. Status ini bukan kepastian adanya celah, bukan penyebab serangan, dan bukan petunjuk jalan masuk ransomware ke institusi.</p>
@@ -301,11 +301,11 @@
     <ul>
      <li>Data diambil otomatis setiap 6 jam dari RansomLook, yang memantau situs kebocoran data kelompok ransomware dan pemeras data.</li>
      <li>Sumber data tidak mencatat negara korban. Korban Indonesia dikenali dari judul dan deskripsi unggahan: domain .id, kata Indonesia, nama kota, PT, Tbk, serta nama instansi seperti kementerian, kabupaten, atau rumah sakit. Unggahan yang hanya menyebut Indonesia secara sambil lalu ditahan untuk diperiksa manual dan tidak langsung tampil.</li>
-     <li>Korban tanpa penanda tersebut tidak tertangkap, jadi angka sebenarnya kemungkinan lebih tinggi. Deteksi otomatis juga bisa keliru; laporan koreksi dapat dikirim ke Vaksincom.</li>
+     <li>Korban tanpa penanda tersebut tidak tertangkap, jadi angka sebenarnya kemungkinan lebih tinggi. Deteksi otomatis juga bisa keliru; laporan koreksi dapat dikirim ke <a href="mailto:info@vaksin.com">info@vaksin.com</a>.</li>
      <li>Satu organisasi yang diklaim beberapa kali dihitung satu kali dalam jumlah organisasi, tetapi setiap klaim tetap ditampilkan di daftar.</li>
      <li>Tanggal adalah waktu unggahan terdeteksi, bukan waktu serangan.</li>
-     <li>Situs organisasi diambil dari judul atau deskripsi unggahan pelaku. Bila pelaku tidak menyebutnya, situs resmi dicocokkan dengan basis data publik dan mesin pencari, dan hanya dipakai bila nama organisasi cocok, berasal dari Indonesia, serta tidak ada kandidat lain yang sama kuat. Nama yang terlalu umum, misalnya dinas tanpa nama daerah, tidak dicocokkan. Sumber setiap alamat ditampilkan di rincian korban.</li>
-     <li>Penilaian Vaksin Site Intel memakai pemeriksaan pasif dari internet, tanpa pemindaian aktif atau mencoba menembus sistem, dan dilakukan satu kali per institusi dengan tanggal pemeriksaan yang ditampilkan. Detail teknis tidak ditampilkan agar tidak dapat disalahgunakan.</li>
+     <li>Alamat situs organisasi hanya ditampilkan bila diumumkan sendiri oleh pelaku di situs kebocorannya. Bila pelaku tidak menyebutnya, alamat tidak ditampilkan di halaman ini.</li>
+     <li>Penilaian Vaksin Site Intel memakai pemeriksaan pasif dari internet, tanpa pemindaian aktif atau mencoba menembus sistem, dan dilakukan satu kali per institusi. Yang ditampilkan hanya status dan tanggal pemeriksaan; detail teknis tidak ditampilkan agar tidak dapat disalahgunakan, dan laporan lengkap hanya untuk institusi yang bersangkutan.</li>
      <li>Status Site Intel adalah indikasi kelemahan domain institusi berdasarkan parameter pengukuran Vaksin Site Intel, untuk membantu institusi mengamankan jaringannya. Status ini bukan kepastian adanya celah, bukan penyebab serangan, dan bukan petunjuk jalan masuk ransomware ke institusi.</li>
     </ul>
    </details>
@@ -319,15 +319,14 @@
 <script>
 (function(){
   var DATA_URL = "https://alfonstan.github.io/vaksin-ransomware-id/data/ransomware-id.json";
-  var INTEL_URL = "https://siteintel.vaksin.com/public/ransomware-intel.json"; /* ringkasan Site Intel per domain */
+  var INTEL_URL = "https://siteintel.vaksin.com/public/ransomware-intel.json"; /* ringkasan Site Intel per ID korban: hanya level + tanggal */
   var INTEL = {};
   var RATING = {danger:["danger","Rawan","Terindikasi ada kelemahan serius pada domain ini yang sebaiknya segera dibenahi."],
     warn:["warn","Waspada","Terindikasi ada kelemahan yang perlu dibenahi."],
     ok:["ok","Baik","Tidak ditemukan indikasi kelemahan serius dari parameter yang diukur."],
     limited:["limited","Terbatas","Sebagian besar sistem berada di balik layanan proteksi, sehingga hanya sebagian yang dapat diukur. Tidak terlihat belum tentu aman."]};
   var DISCLAIMER = "Status Site Intel adalah indikasi kelemahan domain institusi berdasarkan parameter pengukuran Vaksin Site Intel, untuk membantu institusi mengamankan jaringannya. Status ini bukan kepastian adanya celah, bukan penyebab serangan, dan bukan petunjuk jalan masuk ransomware ke institusi.";
-  var SRC = {"unggahan":"disebut dalam unggahan pelaku","verifikasi":"diverifikasi manual oleh Vaksincom",
-    "basis data publik":"situs resmi menurut basis data publik","mesin pencari":"situs resmi yang ditemukan melalui mesin pencari"};
+  
   var host = document.getElementById("vkrw-host"), tpl = document.getElementById("vkrw-tpl");
   if(!host || !tpl) return;
   /* Shadow DOM: CSS tema Duda tidak bisa mengubah tampilan widget */
@@ -451,26 +450,22 @@
     var groups={}; V.forEach(function(v){groups[v.group]=(groups[v.group]||0)+1});
     $("vkrw-g").insertAdjacentHTML("beforeend",Object.keys(groups).sort().map(function(g){return '<option value="'+esc(g)+'">'+esc(g)+" ("+groups[g]+")</option>"}).join(""));
     var shown=20, open=null;
-    function intelOf(v){return v.domain&&INTEL[v.domain]}
+    function intelOf(v){return INTEL[v.id]}
     function chip(v){
-      if(!v.domain) return '<span class="vkrw-chip none" title="Situs organisasi belum dapat dipastikan">Situs belum diketahui</span>';
       var i=intelOf(v), r=i&&RATING[i.rating];
-      return r?'<span class="vkrw-chip '+r[0]+'">'+r[1]+'</span>':'<span class="vkrw-chip none">Belum diperiksa</span>';
+      return r?'<span class="vkrw-chip '+r[0]+'" title="Diperiksa '+tgl(i.scanned_at)+'">'+r[1]+'</span>':'<span class="vkrw-chip none">Belum diperiksa</span>';
     }
     function detail(v){
-      var i=intelOf(v), r=i&&RATING[i.rating], h='<div class="vkrw-x"><div><h3>Situs organisasi</h3>';
-      h+= v.domain ? '<dl><dt>Domain</dt><dd>'+esc(v.domain)+'</dd><dt>Sumber</dt><dd>'+esc(SRC[v.domain_src]||"unggahan pelaku")+'</dd><dt>Diklaim oleh</dt><dd>'+esc(v.group)+', '+tgl(v.date)+'</dd></dl>'
-                     +(v.domain_src&&v.domain_src!=="unggahan"&&v.domain_src!=="verifikasi"?'<p class="vkrw-note">Pelaku tidak menyebut situs. Alamat ini dicocokkan otomatis dengan nama organisasi dan bisa keliru; koreksi dapat dikirim ke Vaksincom.</p>':'')
-                   : '<p>Situs organisasi ini belum dapat dipastikan. Nama yang terlalu umum sengaja tidak dicocokkan agar tidak salah sasaran.</p>';
+      var i=intelOf(v), r=i&&RATING[i.rating], h='<div class="vkrw-x"><div><h3>Klaim</h3>';
+      h+='<dl>'+(v.domain?'<dt>Situs</dt><dd>'+esc(v.domain)+'</dd><dt>Sumber alamat</dt><dd>disebut dalam unggahan pelaku</dd>':'')+'<dt>Diklaim oleh</dt><dd>'+esc(v.group)+', '+tgl(v.date)+'</dd></dl>';
+      h+='<p class="vkrw-note">Klaim pelaku yang belum terverifikasi. Hak jawab atau koreksi: <a href="mailto:info@vaksin.com">info@vaksin.com</a>.</p>';
       h+='</div><div><h3>Penilaian Vaksin Site Intel</h3>';
       if(r){
         h+='<p><span class="vkrw-chip '+r[0]+'">'+r[1]+'</span> '+r[2]+'</p>';
-        if(i.email_spoofable!=null) h+='<p>Email: '+(i.email_spoofable?'domain dapat dipalsukan untuk email penipuan.':'terlindungi dari pemalsuan pengirim.')+'</p>';
-        if(i.categories&&i.categories.length) h+='<ul class="vkrw-cat">'+i.categories.map(function(c){return '<li><span>'+esc(c.name)+'</span><span class="bar"><i style="width:'+c.pct+'%"></i></span><b>'+c.pct+'%</b></li>'}).join("")+'</ul>';
-        h+='<p>Diperiksa '+tgl(i.scanned_at)+'. <a href="/site-intel">Minta laporan lengkap Site Intel</a></p>';
-        h+='<p class="vkrw-note">'+DISCLAIMER+'</p>';
+        h+='<p>Diperiksa '+tgl(i.scanned_at)+', berdasarkan pengamatan pasif dari internet. <a href="/site-intel">Pelajari Vaksin Site Intel</a></p>';
+        h+='<p class="vkrw-note">'+DISCLAIMER+' Laporan lengkap hanya diberikan kepada institusi yang bersangkutan.</p>';
       } else {
-        h+= v.domain ? '<p>Situs ini belum diperiksa. Pemeriksaan berjalan bertahap untuk korban terbaru.</p>' : '<p>Penilaian membutuhkan situs organisasi.</p>';
+        h+='<p>Belum diperiksa. Pemeriksaan berjalan bertahap dan dilakukan satu kali per institusi, berdasarkan pengamatan pasif dari internet.</p>';
         h+='<p><a href="/site-intel">Pelajari Vaksin Site Intel</a></p>';
       }
       return h+'</div></div>';
@@ -493,7 +488,7 @@
   }
 
   var bust=Math.floor(Date.now()/9e5); /* cache 15 menit */
-  var intelP=fetch(INTEL_URL+"?v="+bust).then(function(r){return r.ok?r.json():{}}).then(function(j){INTEL=(j&&j.domains)||{}}).catch(function(){});
+  var intelP=fetch(INTEL_URL+"?v="+bust).then(function(r){return r.ok?r.json():{}}).then(function(j){INTEL=(j&&j.victims)||{}}).catch(function(){});
   fetch(DATA_URL+"?v="+bust,{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
   .then(function(d){return intelP.then(function(){return d})})
   .then(render).catch(function(e){

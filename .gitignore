@@ -3,3 +3,4 @@ preview_logo.png
 __pycache__/
 *.pyc
 .DS_Store
+private/

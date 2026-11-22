@@ -19,6 +19,7 @@ Pemakaian:
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import time
@@ -37,6 +38,24 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "docs" / "data"
 STATE = ROOT / "state"
 CONFIG = ROOT / "config"
+# Data PRIVAT (pemetaan korban -> alamat situs yang bukan diumumkan pelaku). Repo ini publik,
+# jadi folder ini di-.gitignore dan tidak pernah ikut terbit. Di GitHub Actions dipulihkan lewat cache.
+PRIVATE = Path(os.environ.get("VK_PRIVATE_DIR") or ROOT / "private")
+
+# Aturan publikasi /data/ransomware (CLAUDE.md): alamat situs hanya tampil publik bila
+# diumumkan sendiri oleh pelaku (judul/deskripsi unggahan). Selain itu = temuan Vaksincom: privat.
+ASAL_PELAKU, ASAL_VAKSINCOM = "situs_pelaku", "temuan_vaksincom"
+
+
+def domain_asal(domain_via):
+    return ASAL_PELAKU if domain_via in ("judul", "deskripsi") else ASAL_VAKSINCOM
+
+
+def public_domain(v):
+    """Satu-satunya pintu: alamat yang boleh masuk data publik (ditentukan kode, bukan ingatan)."""
+    if v.get("domain") and domain_asal(v.get("domain_via")) == ASAL_PELAKU:
+        return v["domain"]
+    return None
 
 # ---------------------------------------------------------------- deteksi Indonesia
 TLD_ID = r"\b[a-z0-9-]+\.(?:co|go|ac|or|sch|net|web|my|biz|mil|desa|ponpes)\.id\b"
@@ -209,11 +228,6 @@ def merge_dupes(victims):
     return kept
 
 
-# Sumber alamat situs untuk ditampilkan publik (tanpa nama alat).
-SRC_LABEL = {"judul": "unggahan", "deskripsi": "unggahan", "manual": "verifikasi",
-             "basis data publik": "basis data publik", "mesin pencari": "mesin pencari"}
-
-
 def vid(group, title, date):
     return hashlib.sha1(f"{group}|{title}|{date[:10]}".encode()).hexdigest()[:12]
 
@@ -232,6 +246,10 @@ def main():
     seen = load(STATE / "seen.json", {})
     review = load(STATE / "review.json", [])
     global_daily = load(STATE / "global_daily.json", {})
+    # alamat non-pelaku tidak boleh hidup di state publik: buang; dipulihkan dari cache privat di bawah
+    for v in victims:
+        if v.get("domain") and domain_asal(v.get("domain_via")) != ASAL_PELAKU:
+            v["domain"] = v["domain_via"] = None
     ov_raw = load(CONFIG / "overrides.json", {"include": [], "exclude": []})
     overrides = {k: [re.compile(p, re.I) for p in ov_raw.get(k, [])] for k in ("include", "exclude")}
 
@@ -310,8 +328,8 @@ def main():
 
     victims = merge_dupes(victims)
 
-    # domain: koreksi manual (config/domains.json: {"kunci org": "domain.co.id"}) menang atas otomatis
-    dmap = {k: v for k, v in load(CONFIG / "domains.json", {}).items() if not k.startswith("_")}
+    # domain: koreksi manual (PRIVAT: private/domains.json {"kunci org": "domain.co.id"}) menang atas otomatis
+    dmap = {k: v for k, v in load(PRIVATE / "domains.json", {}).items() if not k.startswith("_")}
     for v in victims:
         if v["org"] in dmap:
             v["domain"], v["domain_via"] = (dmap[v["org"]] or None), "manual"
@@ -319,9 +337,13 @@ def main():
             d, src = find_domain(v["title"], "")
             v["domain"], v["domain_via"] = d, src
 
-    # situs resmi dari basis data publik / mesin pencari bila unggahan tidak menyebutnya
+    # situs resmi dari basis data publik / mesin pencari bila unggahan tidak menyebutnya (PRIVAT)
+    lookup = load(PRIVATE / "site_lookup.json", {})
+    for v in victims:  # pulihkan hasil cache tanpa jaringan
+        c = lookup.get(v["org"])
+        if not v.get("domain") and c and c.get("domain"):
+            v["domain"], v["domain_via"] = c["domain"], c["via"]
     if not args.no_fetch:
-        lookup = load(STATE / "site_lookup.json", {})
         retry_before = (now - timedelta(days=30)).isoformat()
         budget = args.max_lookups
         for v in victims:
@@ -339,7 +361,7 @@ def main():
             if d:
                 v["domain"], v["domain_via"] = d, why
             time.sleep(1)
-        save(STATE / "site_lookup.json", dict(sorted(lookup.items())))
+        save(PRIVATE / "site_lookup.json", dict(sorted(lookup.items())))
 
     # pangkas state lama
     cutoff = (now - timedelta(days=420)).date().isoformat()
@@ -353,7 +375,13 @@ def main():
             rv.append(r)
     victims.sort(key=lambda v: v["date"], reverse=True)
 
-    save(STATE / "victims.json", victims)
+    # pemetaan lengkap (id -> alamat + asal) HANYA di folder privat; dipakai portal Site Intel
+    save(PRIVATE / "site_private.json",
+         {v["id"]: {"domain": v["domain"], "asal": domain_asal(v.get("domain_via")), "org": v["org"], "title": v["title"]}
+          for v in victims if v.get("domain")})
+    victims_state = [{**v, "domain": public_domain(v), "domain_via": v.get("domain_via") if public_domain(v) else None}
+                     for v in victims]
+    save(STATE / "victims.json", victims_state)
     save(STATE / "seen.json", seen, compact=True)
     save(STATE / "review.json", rv)
     save(STATE / "global_daily.json", dict(sorted(global_daily.items())))
@@ -391,8 +419,8 @@ def main():
         },
         "top_groups": [{"group": g, "count": n} for g, n in Counter(v["group"] for v in y).most_common(8)],
         "monthly": [{"month": mo, "count": monthly.get(mo, 0)} for mo in months],
-        "victims": [{**{k: v[k] for k in ("id", "date", "group", "title", "org")}, "domain": v.get("domain"),
-                     "domain_src": SRC_LABEL.get(v.get("domain_via")) if v.get("domain") else None} for v in y],
+        "victims": [{**{k: v[k] for k in ("id", "date", "group", "title", "org")}, "domain": public_domain(v),
+                     "domain_src": "unggahan" if public_domain(v) else None} for v in y],
     }
     save(DATA / "ransomware-id.json", out, compact=True)
     print(f"selesai: {out['stats']}")
