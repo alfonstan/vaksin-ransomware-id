@@ -22,3 +22,10 @@ def test_data_publik_tidak_memuat_alamat_temuan():
     assert not (ROOT / "state" / "site_lookup.json").exists()
     for v in json.loads((ROOT / "state/victims.json").read_text()):
         assert not v.get("domain") or v.get("domain_via") in ("judul", "deskripsi")
+
+
+def test_akhir_kalimat_bukan_alamat_situs():
+    desc = "Data was collected randomly. If no negotiation, we publish. See paspor.go.id for info."
+    assert update.find_domain("Indonesia's national passport database leak", desc) == ("paspor.go.id", "deskripsi")
+    assert update.find_domain("x", "leaked randomly.if you pay") == (None, None)
+    assert update.find_domain("contoh.co.id", "") == ("contoh.co.id", "judul")

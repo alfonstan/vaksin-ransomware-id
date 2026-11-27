@@ -4,6 +4,10 @@
   "972828b3c0de": {
    "rating": "warn",
    "scanned_at": "2026-11-22"
+  },
+  "02a850347dcd": {
+   "rating": "danger",
+   "scanned_at": "2026-11-27"
   }
  }
 }

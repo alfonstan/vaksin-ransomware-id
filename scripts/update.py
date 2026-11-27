@@ -176,11 +176,24 @@ NOT_SITE = re.compile(r"(\.onion$|^(?:www\.)?(?:gmail|yahoo|hotmail|outlook|goog
 TLDS_OK = re.compile(r"\.(?:[a-z]{2}|com|net|org|asia|biz|info|tech|group|app|edu|gov|online|site|store|shop)$", re.I)
 
 
+# Akhiran 2 huruf yang bukan negara tapi sering muncul di kalimat Inggris ("...randomly. If").
+NOT_TLD = {"if", "of", "or", "on", "up", "we", "he", "oh", "ok"}
+
+
+def _sentence_break(raw):
+    """"randomly.If" = akhir kalimat + kata berikutnya (huruf besar di awal), bukan alamat situs."""
+    *labels, tld = raw.strip(".").split(".")
+    return (tld[:1].isupper() and tld[1:].islower() and any(l.islower() for l in labels)) \
+        or tld.lower() in NOT_TLD
+
+
 def find_domain(title, desc):
     """Situs organisasi: dari judul dulu, lalu deskripsi (utamakan .id)."""
     def cands(text):
         out = []
         for m in DOMAIN_RX.finditer(text or ""):
+            if _sentence_break(m.group(1)):
+                continue
             d = m.group(1).lower().strip(".")
             d = re.sub(r"^www\.", "", d)
             if "." not in d or NOT_SITE.search(d) or not TLDS_OK.search(d) or re.fullmatch(r"[\d.]+", d):
